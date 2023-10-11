@@ -6,6 +6,8 @@ SECRET_KEY = "django-insecure-dc#kqr_5*$(g-bs+7qqdi)#ai3%-n@a6zjtnvuy31f7&wu-c0*
 
 DEBUG = True
 
+AUTH_USER_MODEL = "users.User"
+
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -105,7 +107,16 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# REST Framework
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["api.auth.auth.JWTAuthentication"],
+}
+
 
 # JWT
 
-AUTHENTICATION_CLASSES = ["tokens.jwt_utils.JWTAuthentication"]
+JWT_CONF = {"TOKEN_LIFETIME_HOURS": 1}
