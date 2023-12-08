@@ -25,7 +25,7 @@ def delete_files_when_file_changed(sender, instance, **kwargs):
         if isinstance(field, models.FileField):
             # it's got a file field. Let's see if it changed
             try:
-                instance_in_db = sender.objects.get(pk=instance.pk)
+                instance_in_db = sender.objects.get()
             except sender.DoesNotExist:
                 # We are probably in a transaction and the PK is just temporary
                 # Don't worry about deleting attachments if they aren't actually saved yet.

@@ -1,9 +1,21 @@
+import hashlib
+import os
+import uuid
+
+import pydenticon
 from django.conf import settings
 from django.http import HttpRequest
-import pydenticon
-import hashlib
-import uuid
-import os
+
+
+def create_avatar_folder(folder_path: str):
+    """Creates a folder if it doesn't exist.
+
+      Args:
+        folder_path: The path to the folder to create.
+    """
+
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
 
 def generate_avatar(username: str, sub_path: str, request: "HttpRequest", file_ext: str = "png"):
@@ -28,7 +40,10 @@ def generate_avatar(username: str, sub_path: str, request: "HttpRequest", file_e
     filename = f"{uuid.uuid4().hex}.{file_ext}"
     file_path = os.path.join(sub_path, filename)
     full_path = os.path.join(settings.MEDIA_ROOT, file_path)
-    print(full_path)
+
+    create_avatar_folder(os.path.join(settings.MEDIA_ROOT, sub_path))
+
     with open(full_path, "wb") as f:
         f.write(identicon)
+
     return file_path

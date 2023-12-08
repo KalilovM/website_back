@@ -6,7 +6,7 @@ from config.helpers.rename import PathAndRename
 
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to=PathAndRename("profile_images/"))
+    avatar = models.ImageField(upload_to=PathAndRename("profile_images/"), null=True)
     email = models.EmailField(unique=True, db_index=True)
 
     def __str__(self):

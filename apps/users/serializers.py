@@ -1,6 +1,5 @@
-from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
 from django.http import HttpRequest
+from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
@@ -21,14 +20,14 @@ class RegisterSerializer(serializers.Serializer):
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
     def get_avatar(self, obj: User):
-        request: "HttpRequest" = self.context.get("request")
-        try:
-            avatar = generate_avatar(obj.username, sub_path="profile_images/defaults/", request=request)
-            obj.avatar = avatar
-            obj.save()
-            return request.build_absolute_uri(obj.avatar.url)
-        except FileNotFoundError:
-            raise serializers.ValidationError("Error while generating avatar")
+        request: "HttpRequest" = self.context.get("request", )
+        # try:
+        avatar = generate_avatar(obj.username, sub_path="profile_images/defaults/", request=request)
+        obj.avatar = avatar
+        obj.save()
+        return request.build_absolute_uri(obj.avatar.url)
+        # except:
+        #     raise serializers.ValidationError("Error while generating avatar")
 
     def validate(self, attrs):
         validator = RegisterValidator(attrs)
@@ -39,27 +38,26 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.ModelSerializer):
-    avatar = serializers.SerializerMethodField()
+    avatar = serializers.CharField(read_only=True)
     password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(read_only=True)
     username = serializers.CharField(max_length=50, min_length=3)
     tokens = serializers.SerializerMethodField()
 
-    def get_avatar(self, obj):
-        user: "User" = get_user(username=obj["username"])
-        request: "HttpRequest" = self.context.get("request")
-        return request.build_absolute_uri(user.avatar.url)
+    class Meta:
+        model = User
+        fields = ["password", "username", "tokens", "avatar", "email"]
 
     def get_tokens(self, obj):
         user: "User" = get_user(username=obj["username"])
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
-    class Meta:
-        model = User
-        fields = ["password", "username", "tokens", "avatar"]
-
     def validate(self, attrs):
+        request = self.context.get("request", )
         validator = LoginValidator(attrs)
-        return validator.validate()
+        data = validator.validate()
+        data["avatar"] = request.build_absolute_uri(data["avatar"])
+        return data
 
 
 class LogoutSerializer(serializers.ModelSerializer):
@@ -74,3 +72,13 @@ class LogoutSerializer(serializers.ModelSerializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail("bad_token")
+
+
+class CurrentUserSerializer(serializers.Serializer):
+    avatar = serializers.CharField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+    username = serializers.CharField(max_length=50, min_length=3)
+
+    class Meta:
+        model = User
+        fields = ["avatar", "email", "username"]

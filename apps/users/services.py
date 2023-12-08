@@ -23,7 +23,19 @@ def get_user(username):
     Returns None if the user does not exist.
     """
     try:
-        user = User.objects.get(username=username)
+        user = User.objects.get()
+        return user
+    except User.DoesNotExist:
+        return None
+
+
+def get_user_by_email(email):
+    """
+    Retrieves a user based on the provided email address.
+    Returns None if the user does not exist.
+    """
+    try:
+        user = User.objects.get()
         return user
     except User.DoesNotExist:
         return None
