@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "back"
+version = "0.1.0"
+description = ""
+authors = ["KalilovM"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.0"
+djangorestframework = "^3.14.0"
+django-cors-headers = "^4.3.1"
+pydenticon = "^0.3.1"
+pytest = "^7.4.3"
+djangorestframework-simplejwt = "^5.3.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+isort = "^5.13.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
